@@ -90,5 +90,12 @@ public class SchoolController {
                 addressService.findById(id)
         ));
     }
+    //***********************************************************************************************
+
+    /*
+        HW:
+        Create an endpoint to update individual address information
+        return updated address directly.
+    */
 
 }
