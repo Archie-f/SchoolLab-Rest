@@ -1,7 +1,10 @@
 package com.cydeo.controller;
 
+import com.cydeo.client.WeatherApiClient;
+import com.cydeo.dto.AddressDTO;
 import com.cydeo.dto.ResponseWrapper;
 import com.cydeo.dto.TeacherDTO;
+import com.cydeo.dto.weather.WeatherResponse;
 import com.cydeo.service.AddressService;
 import com.cydeo.service.ParentService;
 import com.cydeo.service.StudentService;
@@ -9,9 +12,7 @@ import com.cydeo.service.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class SchoolController {
     private final StudentService studentService;
     private final ParentService parentService;
     private final AddressService addressService;
+    private final WeatherApiClient weatherApiClient;
 
     //TASK: Write a method for teachers and return list of teachers
 
@@ -86,10 +88,11 @@ public class SchoolController {
     @GetMapping("/address/{id}")
     public ResponseEntity<ResponseWrapper> getAddress(@PathVariable("id") Long id) throws Exception {
         return ResponseEntity.ok(new ResponseWrapper(
-                "Address " + id + " ia retrieved successfully.",
+                "Address " + id + " is retrieved successfully.",
                 addressService.findById(id)
         ));
     }
+
     //***********************************************************************************************
 
     /*
@@ -97,5 +100,12 @@ public class SchoolController {
         Create an endpoint to update individual address information
         return updated address directly.
     */
+    @PutMapping("/address/{id}")
+    public AddressDTO updateAdressData(@PathVariable("id") Long id, @RequestBody AddressDTO addressDTO) throws Exception {
+        addressDTO.setId(id);
+        return addressService.update(addressDTO);
+    }
+
+
 
 }
