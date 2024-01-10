@@ -1,7 +1,9 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.client.CountryApiClient;
 import com.cydeo.client.WeatherApiClient;
 import com.cydeo.dto.AddressDTO;
+import com.cydeo.dto.country.CountryResponse;
 import com.cydeo.dto.weather.WeatherResponse;
 import com.cydeo.entity.Address;
 import com.cydeo.exception.NotFoundException;
@@ -24,11 +26,13 @@ public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
     private final MapperUtil mapperUtil;
     private final WeatherApiClient weatherApiClient;
+    private final CountryApiClient countryApiClient;
 
-    public AddressServiceImpl(AddressRepository addressRepository, MapperUtil mapperUtil, WeatherApiClient weatherApiClient) {
+    public AddressServiceImpl(AddressRepository addressRepository, MapperUtil mapperUtil, WeatherApiClient weatherApiClient, CountryApiClient countryApiClient) {
         this.addressRepository = addressRepository;
         this.mapperUtil = mapperUtil;
         this.weatherApiClient = weatherApiClient;
+        this.countryApiClient = countryApiClient;
     }
 
     @Override
@@ -45,7 +49,18 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new NotFoundException("No Address Found!"));
         AddressDTO addressDTO = mapperUtil.convert(foundAddress, new AddressDTO());
         addressDTO.setCurrentTemperature(getCurrentTemperature(addressDTO.getCity()));
+        addressDTO.setFlag(getCountryFlag(addressDTO.getCountry()));
         return addressDTO;
+    }
+
+    private String getCountryFlag(String country) {
+        List<CountryResponse> apiClientCountryList = countryApiClient.getCountry(country);
+        CountryResponse countryResponse = apiClientCountryList.get(0);
+
+        if (countryResponse == null || countryResponse.getFlag() == null){
+            return null;
+        }
+        return countryResponse.getFlags().getPng();
     }
 
     private Integer getCurrentTemperature(String city) {

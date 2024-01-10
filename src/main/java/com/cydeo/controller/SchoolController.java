@@ -4,7 +4,6 @@ import com.cydeo.client.WeatherApiClient;
 import com.cydeo.dto.AddressDTO;
 import com.cydeo.dto.ResponseWrapper;
 import com.cydeo.dto.TeacherDTO;
-import com.cydeo.dto.weather.WeatherResponse;
 import com.cydeo.service.AddressService;
 import com.cydeo.service.ParentService;
 import com.cydeo.service.StudentService;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -101,9 +101,21 @@ public class SchoolController {
         return updated address directly.
     */
     @PutMapping("/address/{id}")
-    public AddressDTO updateAdressData(@PathVariable("id") Long id, @RequestBody AddressDTO addressDTO) throws Exception {
+    public AddressDTO updateAddressData(@PathVariable("id") Long id, @RequestBody AddressDTO addressDTO) throws Exception {
         addressDTO.setId(id);
         return addressService.update(addressDTO);
+    }
+
+    @PostMapping("/teachers")
+    public ResponseEntity<ResponseWrapper> createTeacher(@Valid @RequestBody TeacherDTO teacherDTO){
+        TeacherDTO teacher = teacherService.createTeacher(teacherDTO);
+
+        ResponseWrapper responseWrapper = new ResponseWrapper(true,"Teacher is created."
+                ,HttpStatus.CREATED.value(),teacher);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header("teacherId",String.valueOf(teacher.getId()))
+                .body(responseWrapper);
     }
 
 
